@@ -1,5 +1,11 @@
 using DatingAPI.Data;
+using DatingAPI.Extensions;
+using DatingAPI.Interfaces;
+using DatingAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,14 +16,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Connect to DB
-builder.Services.AddDbContext<DataContext>(option =>
-{
-    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+/*Using service extension*/
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
+/**/
 
-//
-builder.Services.AddCors();
 
 
 var app = builder.Build();
@@ -30,7 +33,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 
